@@ -8,20 +8,20 @@ It has two major parts:
 * the server side, which runs using Node.js
 * the client side, which runs in your browser
 
-
-How to get it going
--------------------
+How to get it going - local on Windows
+--------------------------------------
 
 Getting the server up and running is pretty easy. You need to have the following installed:
 
-* Node.js (**v0.8.x** works, v0.6.x series should work, other versions are unknown - let us know if you test them!)
-* gcc-c++
-* GNU make
-* zlib-devel  <-- this is the Fedora/RHEL package name, others may be slightly different
+* Node.js (most recent stable version)
+* Cygwin
+* Microsoft Windows SDK (I don't recall if this is actually required or not; you could try it without the SDK initially and install the SDK if the server does not set up).
+
+Use Cygwin for the following commands - the windows command prompt does not take kindly to some of them. 
 
 Clone the git repo:
 
-    $ git clone git://github.com/browserquest/BrowserQuest.git
+    $ git clone git://github.com/DJOKKATAJA/BrowserQuest.git
     $ cd BrowserQuest
 
 Then install the Node.js dependencies by running:
@@ -44,48 +44,96 @@ The BrowserQuest server should start, showing output like this:
     [Thu Sep 13 2012 17:16:27 GMT-0400 (EDT)] INFO world5 created (capacity: 200 players).
     [Thu Sep 13 2012 17:16:27 GMT-0400 (EDT)] INFO Server (everything) is listening on port 8000
 
+That means it's working.  There should not be any warnings or errors.
+
+Using a browser, connect to: 127.0.0.1:8000
+
+The BrowserQuest start page should appear, and the game should work.
+
+
+Hosting the game publicly on a Linux server:
+--------------------------------------------
+
+Node.js backend setup
+---------------------
+
+Getting the backend server up and running is pretty easy. You need to have the following installed:
+
+* Node.js (most recent version)
+
+Clone the git repo:
+
+    $ git clone git://github.com/browserquest/BrowserQuest.git
+    $ cd BrowserQuest
+
+Then install the Node.js dependencies by running:
+
+    $ npm install -d
+
+Then start the server by running:
+
+    $ node server/js/main.js
+
+The BrowserQuest server should start up, showing output like this:
+
+    $ node server/js/main.js
+    This server can be customized by creating a configuration file named: ./server/config_local.json
+    [Thu Sep 13 2012 17:16:27 GMT-0400 (EDT)] INFO Starting BrowserQuest game server...
+    [Thu Sep 13 2012 17:16:27 GMT-0400 (EDT)] INFO world1 created (capacity: 200 players).
+    [Thu Sep 13 2012 17:16:27 GMT-0400 (EDT)] INFO world2 created (capacity: 200 players).
+    [Thu Sep 13 2012 17:16:27 GMT-0400 (EDT)] INFO world3 created (capacity: 200 players).
+    [Thu Sep 13 2012 17:16:27 GMT-0400 (EDT)] INFO world4 created (capacity: 200 players).
+    [Thu Sep 13 2012 17:16:27 GMT-0400 (EDT)] INFO world5 created (capacity: 200 players).
+    [Thu Sep 13 2012 17:16:27 GMT-0400 (EDT)] INFO Server is listening on port 8000
+
 That means its working.  There should not be any warnings or errors.
 
-Using a browser, connect to port 8000 of the server entered above.  The BrowserQuest start page should appear, and the game should work.
 
+Client side setup
+-----------------
 
-Browser Support
----------------
+Open a new terminal.
 
-* Firefox (any recent) - Works well.
-* Safari 6.x - Background music doesn't play.  Everything else works well.
-* Chrome - Sounds effects don't work.
-* Chromium - Varies wildly.  Some releases display using BrowserQuest's "mobile" layout, with very small screen.  Not recommended.
-* Opera - Doesn't work, no WebSocket support.
-* IE (any version) - Untested.
+First, set the "host" value in client/config/config_build.json-dist, then copy it to/client/config/config_build.json:
 
+    $ vi client/config/config_build.json-dist
+    $ cp client/config/config_build.json-dist client/config/config_build.json
 
-Node.js for Fedora 16 and RHEL6/CentOS
---------------------------------------
+The updated host value must be the IP address of the BrowserQuest Node.js server.  For example:
 
-On Fedora 16 and RHEL 6/CentOS 6, the rpms here are known to work:
+    {
+        "host": "100.200.300.400",
+        "port": 8000
+    }
 
-  http://justinclift.fedorapeople.org/nodejs/
+Then do the same thing for client/config/config_local.json-dist, editing the host value, then copying it to client/config/config_local.json:
 
-Note, those rpms are ugly, unofficial builds by [@justinclift](https://github.com/justinclift).  You are
-most welcome to improve on them. :)
+    $ vi client/config/config_local.json-dist
+    $ cp client/config/config_local.json-dist client/config/config_local.json
 
-Documentation
--------------
+Next, copy the "shared" directory from the root of the git repo, into the "client" directory:
 
-Lots of useful info on the [wiki](https://github.com/browserquest/BrowserQuest/wiki).
+    $ cp -r shared client/
 
-Mailing List
-------------
+Install http-server to run the client:
+	
+	$ npm install -g http-server
+	
+Run http-server from the client directory:
 
-The mailing list for development is at browserquest@librelist.com. ([archives](http://librelist.com/browser/browserquest/))
+	$ cd client
+	$ http-server
 
-To subscribe, just send an email to that address.  Your initial email will be dropped, but will start the subscription.
+You should see:
+	Starting up http-server, serving ./ on port: 8080
+	Hit CTRL-C to stop the server
+	
+No warning messages should be displayed.
 
-IRC Channel
------------
+Using a browser, connect to port 8000 of the IP address you entered above.  The BrowserQuest start page should appear.
 
-\#browserquest on irc.synirc.net
+If you have the BrowserQuest Node.js server running when you do this, you should then be able to launch and play the game.
+
 
 License
 -------
